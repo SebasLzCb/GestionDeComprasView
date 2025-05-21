@@ -13,8 +13,7 @@ import java.util.List;
 public class SolicitudCompraView {
     private Frame frame;
     private TextField txtNumero, txtCedula;
-    private Button btnCrear, btnLimpiar;
-
+    private Button btnCrear;
     // Listas de ejemplo
     private List<Empleado> empleados;
     private List<Proveedor> proveedores;
@@ -35,9 +34,8 @@ public class SolicitudCompraView {
 
         // Botones
         btnCrear = new Button("Crear Solicitud");
-        btnLimpiar = new Button("Limpiar");
         frame.add(btnCrear);
-        frame.add(btnLimpiar);
+
 
         // Acciones
         btnCrear.addActionListener(e -> {
@@ -59,15 +57,18 @@ public class SolicitudCompraView {
             }
 
             System.out.println("❌ La cédula ingresada no corresponde a ningún empleado ni proveedor.");
-        });
 
-        btnLimpiar.addActionListener(e -> {
-            txtNumero.setText("");
-            txtCedula.setText("");
         });
 
         frame.setSize(400, 200);
         frame.setVisible(true);
+
+        // Manejo de cierre
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                frame.dispose();
+            }
+        });
     }
 
     private Empleado buscarEmpleado(String dni) {
@@ -82,9 +83,5 @@ public class SolicitudCompraView {
                 .filter(prov -> prov.getPersona().getDni().equals(dni))
                 .findFirst()
                 .orElse(null);
-    }
-
-    public static void main(String[] args) {
-        new SolicitudCompraView();
     }
 }
