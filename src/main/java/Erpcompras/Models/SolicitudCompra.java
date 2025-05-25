@@ -9,7 +9,7 @@ public class SolicitudCompra {
     private List<DetalleSolicitud> detalles;
     private EstadoSolicitud estado;
 
-    public SolicitudCompra(int numero, Proveedor proveedor) {
+    public SolicitudCompra(int numero, Proveedor proveedor, List<DetalleSolicitud> detalles) {
         this.numero = numero;
         this.proveedor = proveedor;
         this.detalles = new ArrayList<>();
