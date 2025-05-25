@@ -1,89 +1,85 @@
 package Erpcompras.Views;
 
-import Erpcompras.Models.*;
+import Erpcompras.Datos.BaseDeDatos;
+import Erpcompras.Models.Proveedor;
+import Erpcompras.Models.Persona;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class ProveedorView {
-    private Frame frame;
-    private TextField txtId, txtNombre, txtApellido, txtDni, txtTelefono, txtEmail;
-    private Label resultadoLabel;
-
+public class ProveedorView extends BaseView {
     public ProveedorView() {
-        frame = new Frame("📦 Registro de Proveedor");
-        frame.setLayout(new GridLayout(9, 2, 5, 5)); // 9 filas, 2 columnas con espaciado
+        super("Registrar Proveedor");
 
-        // Crear y agregar los campos de entrada con etiquetas centradas
-        txtId = addCenteredLabelAndTextField("ID:");
-        txtNombre = addCenteredLabelAndTextField("Nombre:");
-        txtApellido = addCenteredLabelAndTextField("Apellido:");
-        txtDni = addCenteredLabelAndTextField("DNI:");
-        txtTelefono = addCenteredLabelAndTextField("Teléfono:");
-        txtEmail = addCenteredLabelAndTextField("Email:");
+        // Obtener el panel “card” creado por BaseView
+        JPanel card = (JPanel)((JPanel)getContentPane()).getComponent(0);
 
-        // Espacio vacío para centrar botón
-        frame.add(new Label(""));
+        // Título
+        JLabel lblTitulo = new JLabel("Registrar Proveedor", SwingConstants.CENTER);
+        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        card.add(lblTitulo, BorderLayout.NORTH);
 
-        // Botón centrado
-        Panel buttonPanel = new Panel(new FlowLayout(FlowLayout.CENTER));
-        Button btnRegistrar = new Button("Registrar");
-        buttonPanel.add(btnRegistrar);
-        frame.add(buttonPanel);
+        // Formulario
+        JPanel form = new JPanel(new GridLayout(0, 2, 10, 10));
+        form.setOpaque(false);
+        JTextField txtId    = new JTextField();
+        JTextField txtNom   = new JTextField();
+        JTextField txtApe   = new JTextField();
+        JTextField txtDni   = new JTextField();
+        JTextField txtTel   = new JTextField();
+        JTextField txtEmail = new JTextField();
 
-        // Label de resultado
-        frame.add(new Label("Resultado:", Label.CENTER));
-        resultadoLabel = new Label("", Label.CENTER);
-        frame.add(resultadoLabel);
+        form.add(new JLabel("ID:"));      form.add(txtId);
+        form.add(new JLabel("Nombre:"));  form.add(txtNom);
+        form.add(new JLabel("Apellido:"));//
+        form.add(txtApe);
+        form.add(new JLabel("DNI:"));     form.add(txtDni);
+        form.add(new JLabel("Teléfono:"));//
+        form.add(txtTel);
+        form.add(new JLabel("Email:"));   form.add(txtEmail);
 
-        // Acción del botón
-        btnRegistrar.addActionListener(e -> registrarProveedor());
+        card.add(form, BorderLayout.CENTER);
 
-        // Configuración general
-        frame.setSize(450, 400);
-        frame.setVisible(true);
+        // Botones
+        JPanel acciones = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        acciones.setOpaque(false);
+        JButton btnGuardar  = createButton("Guardar");
+        JButton btnCancelar = createButton("Cancelar");
+        acciones.add(btnGuardar);
+        acciones.add(btnCancelar);
+        card.add(acciones, BorderLayout.SOUTH);
 
-        // Manejo de cierre
-        frame.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                frame.dispose();
-                new MenuPrincipalView();
+        // Lógica de los botones
+        btnGuardar.addActionListener(e -> {
+            try {
+                int id = Integer.parseInt(txtId.getText());
+                String nom  = txtNom.getText().trim();
+                String ape  = txtApe.getText().trim();
+                String dni  = txtDni.getText().trim();
+                String tel  = txtTel.getText().trim();
+                String mail = txtEmail.getText().trim();
+
+                Persona persona = new Persona(nom, ape, dni, tel, mail);
+                Proveedor proveedor = new Proveedor(id, persona);
+                BaseDeDatos.proveedores.add(proveedor);
+
+                JOptionPane.showMessageDialog(this,
+                        "Proveedor registrado exitosamente.",
+                        "Éxito",
+                        JOptionPane.INFORMATION_MESSAGE);
+                dispose();
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this,
+                        "ID inválido. Debe ser un número entero.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
             }
         });
-    }
 
-    // Método para crear etiquetas y campos de texto con etiquetas centradas
-    private TextField addCenteredLabelAndTextField(String labelText) {
-        Label label = new Label(labelText, Label.CENTER);
-        TextField textField = new TextField();
-        frame.add(label);
-        frame.add(textField);
-        return textField;
-    }
+        btnCancelar.addActionListener(e -> dispose());
 
-    // Lógica del registro
-    private void registrarProveedor() {
-        try {
-            if (txtId.getText().isEmpty() || txtNombre.getText().isEmpty() || txtApellido.getText().isEmpty()
-                    || txtDni.getText().isEmpty() || txtTelefono.getText().isEmpty() || txtEmail.getText().isEmpty()) {
-                resultadoLabel.setText("Todos los campos son obligatorios.");
-                return;
-            }
-
-            int id = Integer.parseInt(txtId.getText());
-            String nombre = txtNombre.getText();
-            String apellido = txtApellido.getText();
-            String dni = txtDni.getText();
-            String telefono = txtTelefono.getText();
-            String email = txtEmail.getText();
-
-            Persona persona = new Persona(nombre, apellido, dni, telefono, email);
-            Proveedor proveedor = new Proveedor(id, persona);
-
-            resultadoLabel.setText("Proveedor registrado correctamente.");
-        } catch (NumberFormatException nfe) {
-            resultadoLabel.setText("ID debe ser un número entero.");
-        } catch (Exception ex) {
-            resultadoLabel.setText("Error al registrar: " + ex.getMessage());
-        }
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
     }
 }

@@ -1,129 +1,131 @@
 package Erpcompras.Views;
 
+import Erpcompras.Datos.BaseDeDatos;
 import Erpcompras.Models.*;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class ProductoView {
-    private Frame frame;
-    private TextField txtId, txtNombre, txtPrecio, txtAtributoExtra;
-    private TextArea resultadoArea;
-    private Choice cbTipoProducto;
-    private Choice cbUnidad;
-    private Label lblAtributoExtra;
+public class ProductoView extends BaseView {
 
     public ProductoView() {
-        frame = new Frame("Registrar Producto");
-        frame.setLayout(new GridLayout(9, 2));
+        super("Registrar Producto");
 
-        frame.add(new Label("ID:"));
-        txtId = new TextField();
-        frame.add(txtId);
+        // Obtener el panel “card” de BaseView
+        JPanel card = (JPanel)((JPanel)getContentPane()).getComponent(0);
 
-        frame.add(new Label("Nombre:"));
-        txtNombre = new TextField();
-        frame.add(txtNombre);
+        // Título
+        JLabel lblTitulo = new JLabel("Registrar Producto", SwingConstants.CENTER);
+        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        card.add(lblTitulo, BorderLayout.NORTH);
 
-        frame.add(new Label("Precio:"));
-        txtPrecio = new TextField();
-        frame.add(txtPrecio);
+        // Formulario
+        JPanel form = new JPanel(new GridLayout(0, 2, 10, 10));
+        form.setOpaque(false);
 
-        frame.add(new Label("Unidad de Medida:"));
-        cbUnidad = new Choice();
-        for (UnidadMedida unidad : UnidadMedida.values()) {
-            cbUnidad.add(unidad.name());
-        }
-        frame.add(cbUnidad);
+        JTextField txtId       = new JTextField();
+        JTextField txtNombre   = new JTextField();
+        JTextField txtPrecio   = new JTextField();
+        JComboBox<UnidadMedida> cbUnidad    = new JComboBox<>(UnidadMedida.values());
 
-        frame.add(new Label("Tipo de Producto:"));
-        cbTipoProducto = new Choice();
-        cbTipoProducto.add("Simple");
-        cbTipoProducto.add("Cosmetico");
-        cbTipoProducto.add("Dulce");
-        cbTipoProducto.add("Periferico");
-        frame.add(cbTipoProducto);
-
-        lblAtributoExtra = new Label("Extra:");
-        txtAtributoExtra = new TextField();
-        frame.add(lblAtributoExtra);
-        frame.add(txtAtributoExtra);
-
-        // Actualizar etiqueta según tipo seleccionado
-        cbTipoProducto.addItemListener(e -> actualizarEtiquetaExtra());
-
-        Button btnRegistrar = new Button("Registrar");
-        frame.add(btnRegistrar);
-
-        resultadoArea = new TextArea();
-        frame.add(resultadoArea);
-
-        btnRegistrar.addActionListener(e -> {
-            try {
-                int id = Integer.parseInt(txtId.getText());
-                String nombre = txtNombre.getText();
-                double precio = Double.parseDouble(txtPrecio.getText());
-                UnidadMedida unidad = UnidadMedida.valueOf(cbUnidad.getSelectedItem());
-                String tipoSeleccionado = cbTipoProducto.getSelectedItem();
-                String valorExtra = txtAtributoExtra.getText();
-
-                // Proveedor simulado
-                Persona persona = new Persona("Juan", "Pérez", "12345678", "999999999", "juan@email.com");
-                Proveedor proveedor = new Proveedor(1, persona);
-
-                Producto producto;
-
-                switch (tipoSeleccionado) {
-                    case "Cosmetico":
-                        producto = new ProductoCosmetico(id, nombre, precio, unidad, valorExtra, proveedor);
-                        break;
-                    case "Dulce":
-                        producto = new ProductoDulce(id, nombre, precio, unidad, valorExtra, proveedor);
-                        break;
-                    case "Periferico":
-                        producto = new ProductoPeriferico(id, nombre, precio, unidad, valorExtra, proveedor);
-                        break;
-                    default:
-                        producto = new ProductoSimple(id, nombre, precio, unidad, proveedor);
-                        break;
+        // JComboBox de proveedores, pero mostrando solo nombre y apellido
+        JComboBox<Proveedor> cbProveedor = new JComboBox<>(BaseDeDatos.proveedores.toArray(new Proveedor[0]));
+        cbProveedor.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list,
+                                                          Object value,
+                                                          int index,
+                                                          boolean isSelected,
+                                                          boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof Proveedor p) {
+                    setText(p.getPersona().getNombre() + " " + p.getPersona().getApellido());
                 }
+                return this;
+            }
+        });
 
-                resultadoArea.setText("Producto registrado exitosamente:\n" + producto.toString());
+        JComboBox<TipoProducto> cbTipo      = new JComboBox<>(TipoProducto.values());
+        JLabel lblExtra        = new JLabel("Atributo:");
+        JTextField txtExtra    = new JTextField();
 
+        form.add(new JLabel("ID:"));               form.add(txtId);
+        form.add(new JLabel("Nombre:"));           form.add(txtNombre);
+        form.add(new JLabel("Precio unitario:"));  form.add(txtPrecio);
+        form.add(new JLabel("Unidad de medida:")); form.add(cbUnidad);
+        form.add(new JLabel("Proveedor:"));        form.add(cbProveedor);
+        form.add(new JLabel("Tipo de producto:")); form.add(cbTipo);
+        form.add(lblExtra);                        form.add(txtExtra);
+
+        card.add(form, BorderLayout.CENTER);
+
+        // Ajustar etiqueta y campo extra según tipo
+        cbTipo.addActionListener(e -> {
+            TipoProducto t = (TipoProducto)cbTipo.getSelectedItem();
+            switch (t) {
+                case COSMETICO -> lblExtra.setText("Marca:");
+                case DULCE      -> lblExtra.setText("Sabor:");
+                case PERIFERICO -> lblExtra.setText("Conexión:");
+                default         -> lblExtra.setText("N/A:");
+            }
+            txtExtra.setEnabled(t != TipoProducto.SIMPLE);
+            txtExtra.setText("");
+        });
+
+        // Botones
+        JPanel acciones = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        acciones.setOpaque(false);
+        JButton btnGuardar  = createButton("Guardar");
+        JButton btnCancelar = createButton("Cancelar");
+        acciones.add(btnGuardar);
+        acciones.add(btnCancelar);
+        card.add(acciones, BorderLayout.SOUTH);
+
+        // Lógica de guardado
+        btnGuardar.addActionListener(e -> {
+            try {
+                int id       = Integer.parseInt(txtId.getText().trim());
+                String nombre= txtNombre.getText().trim();
+                double precio= Double.parseDouble(txtPrecio.getText().trim());
+                UnidadMedida unidad = (UnidadMedida)cbUnidad.getSelectedItem();
+                Proveedor prov      = (Proveedor)cbProveedor.getSelectedItem();
+                TipoProducto tipo   = (TipoProducto)cbTipo.getSelectedItem();
+                String extra        = txtExtra.getText().trim();
+
+                Producto p = switch (tipo) {
+                    case COSMETICO ->
+                            new ProductoCosmetico(id, nombre, precio, unidad, extra, prov);
+                    case DULCE ->
+                            new ProductoDulce(id, nombre, precio, unidad, extra, prov);
+                    case PERIFERICO ->
+                            new ProductoPeriferico(id, nombre, precio, unidad, extra, prov);
+                    default ->
+                            new ProductoSimple(id, nombre, precio, unidad, prov);
+                };
+
+                BaseDeDatos.productos.add(p);
+                JOptionPane.showMessageDialog(this,
+                        "Producto registrado exitosamente.",
+                        "Éxito",
+                        JOptionPane.INFORMATION_MESSAGE);
+                dispose();
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this,
+                        "ID o precio inválido. Verifica los valores.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
             } catch (Exception ex) {
-                resultadoArea.setText("Error al registrar producto: " + ex.getMessage());
+                JOptionPane.showMessageDialog(this,
+                        "Error al registrar: " + ex.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        frame.setSize(500, 500);
-        frame.setVisible(true);
+        btnCancelar.addActionListener(e -> dispose());
 
-        frame.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                frame.dispose();
-            }
-        });
-
-        // Inicializar etiqueta extra
-        actualizarEtiquetaExtra();
-    }
-
-    private void actualizarEtiquetaExtra() {
-        String tipo = cbTipoProducto.getSelectedItem();
-        switch (tipo) {
-            case "Cosmetico":
-                lblAtributoExtra.setText("Descripción:");
-                break;
-            case "Dulce":
-                lblAtributoExtra.setText("Sabor:");
-                break;
-            case "Periferico":
-                lblAtributoExtra.setText("Tipo periférico:");
-                break;
-            default:
-                lblAtributoExtra.setText("N/A:");
-                break;
-        }
-        txtAtributoExtra.setEnabled(!tipo.equals("Simple"));
-        txtAtributoExtra.setText("");
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
     }
 }
