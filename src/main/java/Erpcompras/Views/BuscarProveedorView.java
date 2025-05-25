@@ -6,32 +6,47 @@ import java.awt.event.*;
 public class BuscarProveedorView extends Frame {
     public BuscarProveedorView() {
         setTitle("Buscar Proveedor");
-        setSize(300, 200);
-        setLayout(new GridLayout(3, 2));
+        setSize(400, 300);
+        setLayout(new BorderLayout());
 
-        Label rucLabel = new Label("RUC:");
-        TextField rucField = new TextField();
+        TextField nombreField = new TextField();
+        TextArea resultadoArea = new TextArea();
+
         Button buscarBtn = new Button("Buscar");
         Button volverBtn = new Button("Volver");
 
-        add(rucLabel);
-        add(rucField);
-        add(buscarBtn);
-        add(volverBtn);
-
-        buscarBtn.addActionListener(e -> {
-            System.out.println("Buscando proveedor con RUC: " + rucField.getText());
+        buscarBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String nombre = nombreField.getText();
+                // Aquí iría la lógica real para buscar el proveedor
+                resultadoArea.setText("Resultado de búsqueda: " + nombre);
+            }
         });
 
-        volverBtn.addActionListener(e -> {
-            dispose();
-            new MenuPrincipalView().setVisible(true);
+        volverBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+            }
         });
+
+        Panel topPanel = new Panel(new BorderLayout());
+        topPanel.add(new Label("ID:"), BorderLayout.WEST);
+        topPanel.add(nombreField, BorderLayout.CENTER);
+        topPanel.add(buscarBtn, BorderLayout.EAST);
+
+        Panel bottomPanel = new Panel();
+        bottomPanel.add(volverBtn);
+
+        add(topPanel, BorderLayout.NORTH);
+        add(resultadoArea, BorderLayout.CENTER);
+        add(bottomPanel, BorderLayout.SOUTH);
 
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 dispose();
             }
         });
+
+        setVisible(true);
     }
 }
