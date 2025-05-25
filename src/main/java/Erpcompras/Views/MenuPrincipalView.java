@@ -22,9 +22,9 @@ public class MenuPrincipalView {
         agregarBoton("7. Buscar proveedor por ID");
         agregarBoton("8. Buscar producto por nombre");
         agregarBoton("9. Buscar solicitud por número");
-        agregarBoton("13. Aprobar / Rechazar solicitud de compra");
-        agregarBoton("14. Calcular total de una solicitud");
-        agregarBoton("15. Salir");
+        agregarBoton("10. Aprobar / Rechazar solicitud de compra");
+        agregarBoton("11. Calcular total de una solicitud");
+        agregarBoton("12. Salir");
 
         frame.setSize(500, 600);
         frame.setVisible(true);
@@ -70,13 +70,13 @@ public class MenuPrincipalView {
                 case "9. Buscar solicitud por número":
                     new BuscarSolicitudView();
                     break;
-                case "13. Aprobar / Rechazar solicitud de compra":
+                case "10. Aprobar / Rechazar solicitud de compra":
                     new AprobarRechazarView();
                     break;
-                case "14. Calcular total de una solicitud":
+                case "11. Calcular total de una solicitud":
                     new CalcularTotalView();
                     break;
-                case "15. Salir":
+                case "12. Salir":
                     frame.dispose();
                     break;
                 default:
