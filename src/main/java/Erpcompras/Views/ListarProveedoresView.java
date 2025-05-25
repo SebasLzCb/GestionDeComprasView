@@ -1,41 +1,59 @@
 package Erpcompras.Views;
 
-import java.awt.*;
-import java.awt.event.*;
 import Erpcompras.Datos.BaseDeDatos;
+import Erpcompras.Models.Proveedor;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 
-public class ListarProveedoresView extends Frame {
+public class ListarProveedoresView extends BaseView {
+
     public ListarProveedoresView() {
-        setTitle("Lista de Proveedores");
-        setSize(400, 300);
-        setLayout(new BorderLayout());
+        super("Lista de Proveedores");
 
-        TextArea listaProveedores = new TextArea();
-        listaProveedores.setEditable(false);
+        // Panel “card” de BaseView
+        JPanel card = (JPanel)((JPanel)getContentPane()).getComponent(0);
+        card.setLayout(new BorderLayout(0, 20));
 
-        StringBuilder contenido = new StringBuilder();
-        int i = 1;
-        for (String proveedor : BaseDeDatos.proveedores) {
-            contenido.append(i++).append(". ").append(proveedor).append("\n");
+        // Título
+        JLabel lblTitulo = new JLabel("Lista de Proveedores", SwingConstants.CENTER);
+        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        card.add(lblTitulo, BorderLayout.NORTH);
+
+        // Configurar tabla con encabezados
+        String[] columnas = {"ID", "Nombre", "Apellido", "DNI", "Teléfono", "Email"};
+        DefaultTableModel modelo = new DefaultTableModel(columnas, 0) {
+            @Override public boolean isCellEditable(int row, int col) { return false; }
+        };
+
+        // Llenar modelo desde BaseDeDatos
+        for (Proveedor p : BaseDeDatos.proveedores) {
+            modelo.addRow(new Object[]{
+                    p.getId(),
+                    p.getPersona().getNombre(),
+                    p.getPersona().getApellido(),
+                    p.getPersona().getDni(),
+                    p.getPersona().getTelefono(),
+                    p.getPersona().getEmail()
+            });
         }
 
-        listaProveedores.setText(contenido.toString());
+        JTable tabla = new JTable(modelo);
+        JScrollPane pane = new JScrollPane(tabla);
+        pane.setPreferredSize(new Dimension(500, 250));
+        card.add(pane, BorderLayout.CENTER);
 
-        Button volverBtn = new Button("Volver");
-        volverBtn.addActionListener(e -> dispose());
+        // Botón Volver
+        JPanel acciones = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        acciones.setOpaque(false);
+        JButton btnVolver = createButton("Volver");
+        acciones.add(btnVolver);
+        card.add(acciones, BorderLayout.SOUTH);
 
-        add(listaProveedores, BorderLayout.CENTER);
+        btnVolver.addActionListener(e -> dispose());
 
-        Panel bottomPanel = new Panel();
-        bottomPanel.add(volverBtn);
-        add(bottomPanel, BorderLayout.SOUTH);
-
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                dispose();
-            }
-        });
-
+        pack();
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 }

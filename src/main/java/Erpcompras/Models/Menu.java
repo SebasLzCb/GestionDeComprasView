@@ -141,7 +141,8 @@ public class Menu {
             return;
         }
 
-        SolicitudCompra solicitud = new SolicitudCompra(numero, proveedor);
+        List<DetalleSolicitud> detalles = List.of();
+        SolicitudCompra solicitud = new SolicitudCompra(numero, proveedor, detalles);
         String continuar = "s";
 
         do {

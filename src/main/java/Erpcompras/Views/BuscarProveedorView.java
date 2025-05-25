@@ -1,52 +1,81 @@
 package Erpcompras.Views;
 
+import Erpcompras.Datos.BaseDeDatos;
+import Erpcompras.Models.Proveedor;
+import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 
-public class BuscarProveedorView extends Frame {
+public class BuscarProveedorView extends BaseView {
+
     public BuscarProveedorView() {
-        setTitle("Buscar Proveedor");
-        setSize(400, 300);
-        setLayout(new BorderLayout());
+        super("Buscar Proveedor");
 
-        TextField nombreField = new TextField();
-        TextArea resultadoArea = new TextArea();
+        // Panel “card” de BaseView
+        JPanel card = (JPanel)((JPanel)getContentPane()).getComponent(0);
+        card.setLayout(new BorderLayout(0, 20));
 
-        Button buscarBtn = new Button("Buscar");
-        Button volverBtn = new Button("Volver");
+        // Título
+        JLabel lblTitulo = new JLabel("Buscar Proveedor", SwingConstants.CENTER);
+        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        card.add(lblTitulo, BorderLayout.NORTH);
 
-        buscarBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String nombre = nombreField.getText();
-                // Aquí iría la lógica real para buscar el proveedor
-                resultadoArea.setText("Resultado de búsqueda: " + nombre);
+        // Formulario y resultados en un solo panel central
+        JPanel center = new JPanel(new BorderLayout(0, 15));
+        center.setOpaque(false);
+
+        // Formulario: etiqueta, campo y botón Buscar
+        JPanel form = new JPanel(new BorderLayout(10, 0));
+        form.setOpaque(false);
+        JLabel lblId = new JLabel("ID:");
+        lblId.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        JTextField txtId = new JTextField();
+        JButton btnBuscar = createButton("Buscar");
+        form.add(lblId, BorderLayout.WEST);
+        form.add(txtId, BorderLayout.CENTER);
+        form.add(btnBuscar, BorderLayout.EAST);
+
+        center.add(form, BorderLayout.NORTH);
+
+        // Área de texto para mostrar el resultado
+        JTextArea txtResult = new JTextArea(6, 30);
+        txtResult.setEditable(false);
+        txtResult.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        JScrollPane scroll = new JScrollPane(txtResult);
+        center.add(scroll, BorderLayout.CENTER);
+
+        card.add(center, BorderLayout.CENTER);
+
+        // Botones de acción: Buscar y Volver
+        JPanel acciones = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
+        acciones.setOpaque(false);
+        JButton btnVolver = createButton("Volver");
+        acciones.add(btnVolver);
+        card.add(acciones, BorderLayout.SOUTH);
+
+        // Lógica del botón Buscar
+        btnBuscar.addActionListener(e -> {
+            String text = txtId.getText().trim();
+            try {
+                int id = Integer.parseInt(text);
+                Proveedor prov = BaseDeDatos.proveedores.stream()
+                        .filter(p -> p.getId() == id)
+                        .findFirst()
+                        .orElse(null);
+                if (prov != null) {
+                    txtResult.setText(prov.toString());
+                } else {
+                    txtResult.setText("Proveedor con ID " + id + " no encontrado.");
+                }
+            } catch (NumberFormatException ex) {
+                txtResult.setText("ID inválido. Debe ser un número.");
             }
         });
 
-        volverBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
-        });
+        // Lógica del botón Volver
+        btnVolver.addActionListener(e -> dispose());
 
-        Panel topPanel = new Panel(new BorderLayout());
-        topPanel.add(new Label("ID:"), BorderLayout.WEST);
-        topPanel.add(nombreField, BorderLayout.CENTER);
-        topPanel.add(buscarBtn, BorderLayout.EAST);
-
-        Panel bottomPanel = new Panel();
-        bottomPanel.add(volverBtn);
-
-        add(topPanel, BorderLayout.NORTH);
-        add(resultadoArea, BorderLayout.CENTER);
-        add(bottomPanel, BorderLayout.SOUTH);
-
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                dispose();
-            }
-        });
-
+        pack();
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 }

@@ -1,46 +1,66 @@
 package Erpcompras.Views;
 
 import Erpcompras.Datos.BaseDeDatos;
+import Erpcompras.Models.SolicitudCompra;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.*;
 
-public class ListarSolicitudesView extends Frame {
+public class ListarSolicitudesView extends BaseView {
 
     public ListarSolicitudesView() {
-        setTitle("Lista de Solicitudes");
-        setSize(400, 300);
-        setLayout(new BorderLayout());
+        super("Lista de Solicitudes");
 
-        TextArea listaSolicitudes = new TextArea();
-        listaSolicitudes.setEditable(false);
+        // Panel “card” de BaseView
+        JPanel card = (JPanel)((JPanel)getContentPane()).getComponent(0);
+        card.setLayout(new BorderLayout(0, 20));
 
-        StringBuilder contenido = new StringBuilder();
-        int i = 1;
-        for (String solicitud : BaseDeDatos.solicitudes) {
-            contenido.append(i++).append(". ").append(solicitud).append("\n");
+        // Título
+        JLabel lblTitulo = new JLabel("Lista de Solicitudes", SwingConstants.CENTER);
+        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        card.add(lblTitulo, BorderLayout.NORTH);
+
+        // Configurar tabla con encabezados
+        String[] columnas = {"#", "Número", "Proveedor", "Email", "Estado", "Total"};
+        DefaultTableModel modelo = new DefaultTableModel(columnas, 0) {
+            @Override public boolean isCellEditable(int row, int col) { return false; }
+        };
+
+        // Llenar modelo desde BaseDeDatos
+        int idx = 1;
+        for (SolicitudCompra s : BaseDeDatos.solicitudes) {
+            modelo.addRow(new Object[]{
+                    idx++,
+                    s.getNumero(),
+                    s.getProveedor().getPersona().getNombre() + " " +
+                            s.getProveedor().getPersona().getApellido(),
+                    s.getProveedor().getPersona().getEmail(),
+                    s.getEstado(),
+                    String.format("%.2f", s.calcularTotal())
+            });
         }
 
-        if (contenido.length() == 0) {
-            contenido.append("No hay solicitudes registradas.");
+        // Si no hay datos, mostrar mensaje
+        if (modelo.getRowCount() == 0) {
+            modelo.addRow(new Object[]{"", "", "No hay solicitudes registradas.", "", "", ""});
         }
 
-        listaSolicitudes.setText(contenido.toString());
+        JTable tabla = new JTable(modelo);
+        JScrollPane pane = new JScrollPane(tabla);
+        pane.setPreferredSize(new Dimension(500, 250));
+        card.add(pane, BorderLayout.CENTER);
 
-        Button volverBtn = new Button("Volver");
-        volverBtn.addActionListener(e -> dispose());
+        // Botón Volver
+        JPanel acciones = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        acciones.setOpaque(false);
+        JButton btnVolver = createButton("Volver");
+        acciones.add(btnVolver);
+        card.add(acciones, BorderLayout.SOUTH);
 
-        add(listaSolicitudes, BorderLayout.CENTER);
+        btnVolver.addActionListener(e -> dispose());
 
-        Panel bottomPanel = new Panel();
-        bottomPanel.add(volverBtn);
-        add(bottomPanel, BorderLayout.SOUTH);
-
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                dispose();
-            }
-        });
-
+        pack();
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 }
