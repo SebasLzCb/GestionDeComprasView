@@ -9,34 +9,45 @@ public class AprobarRechazarView extends Frame {
         setSize(400, 300);
         setLayout(new GridLayout(3, 2));
 
-        Label idLabel = new Label("ID de Solicitud:");
-        TextField idField = new TextField();
+
+        TextArea resultadoArea = new TextArea("Aquí se mostraría la solicitud pendiente...");
+        Panel botonPanel = new Panel(new FlowLayout());
 
         Button aprobarBtn = new Button("Aprobar");
         Button rechazarBtn = new Button("Rechazar");
         Button volverBtn = new Button("Volver");
 
-        add(idLabel); add(idField);
-        add(aprobarBtn); add(rechazarBtn);
-        add(volverBtn);
-
-        aprobarBtn.addActionListener(e -> {
-            System.out.println("Solicitud " + idField.getText() + " aprobada.");
+        aprobarBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                resultadoArea.setText("Solicitud aprobada.");
+            }
         });
 
-        rechazarBtn.addActionListener(e -> {
-            System.out.println("Solicitud " + idField.getText() + " rechazada.");
+        rechazarBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                resultadoArea.setText("Solicitud rechazada.");
+            }
         });
 
-        volverBtn.addActionListener(e -> {
-            dispose();
-            new MenuPrincipalView().setVisible(true);
-        });
-
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent we) {
+        volverBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 dispose();
             }
         });
+
+        botonPanel.add(aprobarBtn);
+        botonPanel.add(rechazarBtn);
+        botonPanel.add(volverBtn);
+
+        add(resultadoArea, BorderLayout.CENTER);
+        add(botonPanel, BorderLayout.SOUTH);
+
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                dispose();
+            }
+        });
+
+        setVisible(true);
     }
 }
