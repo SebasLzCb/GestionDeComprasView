@@ -1,7 +1,9 @@
 package Erpcompras.Views;
 
+import javax.swing.*;
+
 public class AppAWT {
     public static void main(String[] args) {
-        new MenuPrincipalView();
+        SwingUtilities.invokeLater(LoginView::new);
     }
 }
