@@ -55,37 +55,12 @@ Para compilar y ejecutar el proyecto:
   ```bash
   java Main
   ```
-Diagrama de Clases
-
-(Espacio reservado para insertar el diagrama de clases)
-
-Aquí debes subir el diagrama cuando subas tu repositorio en GitHub.
-
-Estructura del Proyecto
-``` plaintext
-src/
- └── main/
-      └── java/
-           └── Erpcompras/
-                ├── Models/
-                │    ├── Producto.java (Clase abstracta)
-                │    ├── ProductoSimple.java
-                │    ├── ProductoDulce.java
-                │    ├── ProductoCosmetico.java
-                │    ├── ProductoPeriferico.java
-                │    ├── Proveedor.java
-                │    └── SolicitudCompra.java
-                ├── util/
-                │    ├── UnidadMedida.java (Enum)
-                │    ├── EstadoSolicitud.java (Enum)
-                │    └── Calculable.java (Interfaz funcional)
-                └── MenuPrincipal.java (Menú interactivo)
-```
+--- 
 
 Al iniciar el sistema, aparecerá un menú gráfico desde el cual se puede acceder a todas las funcionalidades mediante botones.
 
-Diagrama de Clases (Interfaz Gráfica)
-(Espacio reservado para insertar el diagrama de clases de las vistas)
+
+## **Diagrama de Clases (Interfaz Gráfica)**
 
 Se deben incluir las clases que representan las ventanas gráficas, como ProductoView, ProveedorView, SolicitudView, etc.
 
